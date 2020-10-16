@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    var canvas = document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = 1;
+    var ctx = canvas.getContext('2d');
+    function getRgba(color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(0, 0, 1, 1);
+          var colorData = ctx.getImageData(0, 0, 1, 1).data;
+          return {
+              r: colorData[0],
+              g: colorData[1],
+              b: colorData[2],
+              a: colorData[3]
+          };
+      }
+     function init(){
+        console.log(getRgba('red'));
+        console.log(getRgba('#F00'));
+        console.log(getRgba('#FF0000'));
+     }
+  </script>
+</head>
+
+<body onload="init()">
+</body>
+
+</html>

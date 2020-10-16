@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    function init() {
+      var canvas = document.getElementById('can');
+      var ctx = canvas.getContext('2d');
+
+      var img = new Image();
+      img.src = 'g.jpg';
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        img.style.display = 'none';
+      };
+      var color = document.getElementById('color');
+      function pick(event) {
+        var x = event.layerX;
+        var y = event.layerY;
+        var pixel = ctx.getImageData(x, y, 1, 1);
+        var data = pixel.data;
+        var rgba = 'rgba(' + data[0] + ',' + data[1] +
+        ',' + data[2] + ',' + (data[3] / 255) + ')';
+        color.style.background = rgba;
+        color.textContent = rgba;
+      }
+      canvas.addEventListener('mousemove', pick);
+    }
+
+  </script>
+</head>
+
+<body onload="init()">
+  <div id = 'color'></div> 
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

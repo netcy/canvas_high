@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    // https://ansue1234.github.io/FractalTree/
+    function init() {
+      var canvas = document.getElementById('can');
+    //   dpr(canvas);
+      var ctx = canvas.getContext('2d');
+      function dpr(canvas) {
+        let width = canvas.width,
+          height = canvas.height;
+        if (window.devicePixelRatio) {
+          canvas.style.width = width + "px";
+          canvas.style.height = height + "px";
+          canvas.height = height * window.devicePixelRatio;
+          canvas.width = width * window.devicePixelRatio;
+          var ctx = canvas.getContext('2d');
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+      
+      var branch = new Branch(new Vec2(500,790),new  Vec2(500,650));
+      var angle = Math.PI * 30 / 180;
+
+      var branchArray = [branch];
+      fractal(branch,15);
+
+      function drawBranch(branch) {
+        ctx.beginPath();
+        ctx.moveTo(branch.start.x,branch.start.y);
+        ctx.lineTo(branch.end.x,branch.end.y);
+        ctx.lineWidth = branch.lineWidth;
+        ctx.lineCap="round";
+        ctx.strokeStyle = branch.color;
+        ctx.stroke();
+      }
+
+     
+     
+
+      (function draw(){
+           branchArray.forEach(function (branch) {
+                drawBranch(branch);
+            }); 
+      })()
+      
+      function fractal(branch,iter){
+          if(iter <= 0){
+              return;
+          }
+          var diff = new Vec2().subVectors(branch.end,branch.start);
+          var oldLength = diff.length();
+          var oldAngle = branch.angle;
+          var oldLineWidth = branch.lineWidth;
+          
+          var newStart = new Vec2(branch.end.x,branch.end.y);
+          var leftLength = oldLength * ( Math.random() * 0.2 + 0.6);
+          var leftAngle = oldAngle - angle + Math.random() * 5 * Math.PI / 180;
+          var leftEnd  = new Vec2();
+          leftEnd.x = newStart.x + leftLength * Math.sin(leftAngle);
+          leftEnd.y = newStart.y - leftLength * Math.cos(leftAngle);
+          var leftBranch = new Branch(newStart,leftEnd); 
+          leftBranch.lineWidth = oldLineWidth * 0.8;
+          leftBranch.color = branch.color; //TODO color 要设置渐变
+          leftBranch.angle = leftAngle;
+          branchArray.push(leftBranch);
+
+          var rightLength = oldLength * ( Math.random() * 0.2 + 0.6);
+          var rightAngle = oldAngle + angle + Math.random() * 5 * Math.PI / 180;
+          var rightEnd  = new Vec2();
+          rightEnd.x = newStart.x + rightLength * Math.sin(rightAngle);
+          rightEnd.y = newStart.y - rightLength * Math.cos(rightAngle);
+          var rightBranch = new Branch(newStart,rightEnd); 
+          rightBranch.lineWidth = oldLineWidth * 0.7;
+          rightBranch.color = branch.color; //TODO color 要设置渐变
+          rightBranch.angle = rightAngle;
+          branchArray.push(rightBranch);
+          fractal(leftBranch,iter - 1);
+          fractal(rightBranch,iter - 1);
+      }
+    }
+
+    class Branch {
+        constructor(start,end){
+            this.start = start;
+            this.end = end;
+            this.lineWidth = 20;
+            this.color = 'green';
+            this.left = undefined;  // 初始值为null
+            this.right = undefined;
+            this.angle = 0;
+        }
+    }
+
+     class Vec2 {
+        constructor(x = 0,y = 0){
+            this.x = x;
+            this.y = y;
+        }
+        addVectors(a,b){
+           this.x = a.x + b.x;
+           this.y = a.y + b.y; 
+           return this;
+        }
+        subVectors(a,b){
+            this.x = a.x - b.x;
+            this.y = a.y - b.y;
+            return this;
+        }
+        lerpVectors(a,b,r){
+            this.x = a.x + (b.x - a.x) * r;
+            this.y = a.y + (b.y - a.y) * r;
+            return this;
+        }  
+         length(){
+            let x = this.x,y = this.y;
+            return Math.sqrt(x * x + y * y);
+        }    
+    }
+
+     // function drawBranch2(branch){
+      //     var lineWidth = branch.lineWidth;
+      //     if(lineWidth <= 2){
+      //         return drawBranch(branch);
+      //     }
+      //     var start = branch.start,end = branch.end;
+      //     var iter = 20;
+      //     for(var i = 0;i < iter;i ++){
+      //         var v = new Vec2().lerpVectors(start,end,i / iter);
+      //         ctx.beginPath();
+      //         var r = (lineWidth * (iter - i)  + i * (lineWidth * 0.9))/iter
+      //         ctx.arc(v.x,v.y,r,0,Math.PI * 2);
+      //         ctx.fillStyle = branch.color;
+      //         ctx.fill();
+      //     }
+      // }
+
+  </script>
+</head>
+
+<body onload="init()" >
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

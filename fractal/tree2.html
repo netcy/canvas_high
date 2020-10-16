@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<style type="text/css">
+	body{
+		margin: 0;
+		padding: 0;
+		overflow : hidden;
+	}
+</style>
+</head>
+<body>
+    <script type="text/javascript">
+    	var Tree = (function(){
+    		var canvas = document.createElement("canvas"),ctx = canvas.getContext("2d"),W = window.innerWidth,H = window.innerHeight;
+    		var maxAngle = Math.PI/2,maxBranch = 3;
+    		canvas.height = H;canvas.width = W;
+    		document.body.appendChild(canvas);
+    		var init = function(x,y){
+    			var x = x || W /2,y = y || H /2 + 100;
+    			draw(x,y,60,-Math.PI/2,12,12);
+    		}
+    		var draw = function(startX,startY,length,angle,depth,branchWidth){
+    			var color,endX,endY,subBranches,newAngle,newLength;
+    			ctx.beginPath();
+    			ctx.moveTo(startX,startY);
+    			endX = startX + length * Math.cos(angle);
+    			endY = startY + length * Math.sin(angle);
+    			ctx.lineCap = 'round';
+    			ctx.lineWidth = branchWidth;
+    			ctx.lineTo(endX,endY);
+    			if(depth--<=2){
+    				color = 'rgb(0,' + (rand(128,192)>>0) + ',0)';
+    			}else{
+    				color = 'rgb(' + (rand(64,128)>>0) + ',50,25)';
+    			}
+    			ctx.strokeStyle = color;
+    			ctx.stroke();
+    			if(!depth) return;
+    			subBranches = rand(1,maxBranch);
+    			branchWidth *= 0.7;
+    			for(var i=0;i<subBranches;i++){
+    				newAngle = angle + rand(-Math.PI/4,Math.PI/4);
+    				newLength = length * rand(0.7,1);
+    				draw(endX,endY,newLength,newAngle,depth,branchWidth)
+    			}
+
+    		}
+    		var rand = function(min,max){
+    			return Math.random() * (max-min) + min;
+    		}
+    		return {init : init}
+    	})();
+    	window.onload = function(){
+    		Tree.init();
+    	}
+    </script>
+</body>
+</html>

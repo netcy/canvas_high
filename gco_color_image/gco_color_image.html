@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    var templateMap = {},
+      first = true,
+      rectMap = null,
+      lineRectMap = {};
+
+    function init() {
+      var canvas = document.getElementById('can');
+      var ctx = canvas.getContext('2d');
+
+      var image = new Image();
+      image.onload = function () {
+        var color = {
+          r: 255,
+          g: 0,
+          b: 0,
+          a: 1,
+        }
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        var tempImage = createTempImage(image);
+
+        var img = createColorImage3(tempImage, 'red', image.width, image.height);
+        ctx.drawImage(img, 100, 100, image.width, image.height);
+      };
+      image.src = "d.png";
+    }
+
+    // 如果是svg 图片，gco方式 在firefox下面有bug，需要先转成canvas
+    function createTempImage(image) {
+      if (!image.src.endsWith('.svg')) {
+        return image;
+      }
+      var tempCanvas = createCanvas(image.width, image.height);
+      var tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(image, 0, 0, image.width, image.height);
+      return tempCanvas;
+    }
+
+    function createCanvas(width, height) {
+      var c = document.createElement('canvas');
+      c.width = width;
+      c.height = height;
+      return c;
+    }
+
+
+  
+
+    function createColorImage3(image, color, width, height) {
+      var c = createCanvas(width, height);
+      var g2 = c.getContext('2d');
+      
+      g2.drawImage(image, 0, 0, width, height);
+      // g2.globalCompositeOperation = "multiply";
+      // g2.globalCompositeOperation = "overlay";
+      g2.globalCompositeOperation = "color";
+      g2.fillStyle = color;
+      g2.fillRect(0, 0, width, height);
+      g2.globalCompositeOperation = "destination-atop";
+      g2.drawImage(image, 0, 0, width, height);
+      return c;
+    };
+
+    function createColorImage4(image, color, width, height) {
+      var c = createCanvas(width, height);
+      var g2 = c.getContext('2d');
+      g2.drawImage(image, 0, 0, width, height);
+      // g2.globalCompositeOperation = 'color';
+      g2.globalCompositeOperation = 'overlay';
+      g2.fillStyle = color;
+      g2.fillRect(0, 0, width, height);
+      g2.globalCompositeOperation = "destination-atop";
+      g2.drawImage(image, 0, 0, width, height);
+      return c;
+    };
+  </script>
+</head>
+
+<body onload="init()">
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    var templateMap = {},
+      first = true,
+      rectMap = null,
+      lineRectMap = {};
+
+    function init() {
+      var canvas = document.getElementById('can');
+      // dpr(canvas);
+
+      function dpr(canvas) {
+        let width = canvas.width,
+          height = canvas.height;
+        if (window.devicePixelRatio) {
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          canvas.height = height * window.devicePixelRatio;
+          canvas.width = width * window.devicePixelRatio;
+          var ctx = canvas.getContext('2d');
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+
+      var ctx = canvas.getContext('2d');
+
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = canvas.width;
+      offCanvas.height = canvas.height;
+
+      var image = new Image();
+      image.onload = function () {
+        draw();
+      };
+      image.src = './girl.jpg';
+
+      var isMouseDown = false;
+      // 鼠标按下
+      canvas.onmousedown = function (event) {
+        event.preventDefault() // 禁用默认事件
+        var point = windowToCanvas(event.clientX, event.clientY) // 获取鼠标相对于 canvas 标签的坐标
+        isMouseDown = true
+        draw(point) // 绘制在离屏canvas上绘制放大后的图像
+      }
+
+      // 鼠标移动
+      canvas.onmousemove = function (event) {
+        event.preventDefault() // 禁用默认事件
+        // if (isMouseDown === true) {
+          var point = windowToCanvas(event.clientX, event.clientY)
+          // drawCanvasWithMagnifier(true, point)
+          draw(point);
+        // }
+      }
+
+      // 鼠标松开
+      canvas.onmouseup = function (event) {
+        event.preventDefault() // 禁用默认事件
+        isMouseDown = false
+        // drawCanvasWithMagnifier(false) // 不绘制离屏放大镜
+        draw();
+      }
+
+      // 鼠标移出canvas标签
+      canvas.onmouseout = function (event) {
+        event.preventDefault() // 禁用默认事件
+        isMouseDown = false
+        // drawCanvasWithMagnifier(false) // 不绘制离屏放大镜
+        draw();
+      }
+
+      function windowToCanvas(x, y) {
+        var bbox = canvas.getBoundingClientRect() // bbox中存储的是canvas相对于屏幕的坐标
+        return {
+          x: x - bbox.x,
+          y: y - bbox.y
+        }
+      }
+
+      function draw(point) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawImage(image);
+        if (point) {
+          drawMagnifier(point.x, point.y, 30);
+        }
+
+      }
+
+      function drawImage(image) {
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+      }
+
+      function drawMagnifier(x, y, radius, times) {
+        ctx.save();
+        times = times || 1.5;
+        var sx = x - radius,
+          sy = y - radius,
+          mr = radius * 2,
+          dx = x - times * radius,
+          dy = y - times * radius
+
+        ctx.beginPath();
+        ctx.arc(x, y, radius * times - 1, 0, Math.PI * 2, false);
+        ctx.clip();
+        ctx.drawImage(canvas, sx, sy, mr, mr, dx, dy, times * mr, times * mr)
+        // ctx.drawImage(canvas, sx, sy, mr, mr, sx, sy, mr, mr)
+        // ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'red';
+        // ctx.strokeRect(dx, dy, times * mr, times * mr);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  </script>
+</head>
+
+<body onload="init()">
+  <canvas width="1000" height="600" id='can'></canvas>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <style>
+    body{
+        padding:0;
+        margin:0;
+        background: #000;
+    }
+  </style>
+  <title>Canvas 拖尾效果</title>
+  <script type="text/javascript">
+    function init() {
+        var canvas = document.querySelector('#cvs');
+        let ctx = canvas.getContext('2d')
+        dpr(canvas);
+        function dpr(canvas) {
+            let width = canvas.width,
+            height = canvas.height;
+            if (window.devicePixelRatio) {
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+            canvas.height = height * window.devicePixelRatio;
+            canvas.width = width * window.devicePixelRatio;
+            var ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+        }
+
+        var image = new Image();
+        image.onload = function () {
+          image._loaded = true;
+        }
+        image.src = 'anhui.png';
+
+        var location = {
+          x:20,y:20
+        };
+
+
+
+        function draw() {
+          mask();
+          ctx.save();
+          ctx.fillStyle = 'red';
+          ctx.beginPath();
+          ctx.arc(location.x,location.y, 3, 0, Math.PI*2);
+          ctx.fill();
+          ctx.restore();
+          move();
+          requestAnimationFrame(draw)
+        }
+
+        function mask(){
+            ctx.save();
+           
+            if(image._loaded){
+              ctx.globalAlpha = 0.1;
+              ctx.drawImage(image,0,0);
+            }else{
+              ctx.fillStyle="rgba(0,0,255,0.1)"
+              ctx.fillRect(0,0,canvas.width,canvas.height);
+            }
+            
+            ctx.restore();
+        }
+
+        function move(){
+           location.x += 2;
+           location.y += 2;
+           if(location.y > 500){
+             location.y = 20;
+             location.x = 20;
+           }
+        }
+
+        draw();
+    }
+  </script>
+</head>
+
+<body onload="init()" >
+  <canvas width="1000" height="800" id='cvs'></canvas>
+</body>
+
+</html>

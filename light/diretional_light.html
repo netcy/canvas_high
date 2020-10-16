@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>direction light</title>
+    </head>
+
+    <body>
+       <div class="box">
+         <div>光照角度<input type="range" id="range" min="-180" max="180"><span id="angle">0</span></div>
+         <p>光照方向和法线向量点积 = <span id="value">1.0</span></p>
+       </div>
+        <canvas id="canvas" width="1800" height="800"></canvas>
+       <script src="./diretional_light.js"></script>
+    </body>
+
+</html>

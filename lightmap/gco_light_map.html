@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title>first</title>
+  <script type="text/javascript">
+   function init() {
+     var canvas = document.getElementById('can');
+     var ctx = canvas.getContext('2d');
+     var lightMap = new Image();
+     var bg = new Image();
+     function draw(){
+      ctx.drawImage(bg, 0, 0, 256, 256);
+      // algorithm1();
+      algorithm2();
+      // algorithm3();
+     }
+     lightMap.addEventListener('load', function() { bg.addEventListener('load', draw, false); }, false);
+     lightMap.src = 'light_map.png';
+     bg.src = './testmap.gif';
+
+    function algorithm1() {
+      var lightMapCanvas = document.createElement('canvas');
+      lightMapCanvas.width = canvas.width;
+      lightMapCanvas.height = canvas.height;
+      var lightMapCtx = lightMapCanvas.getContext('2d');
+      lightMapCtx.drawImage(lightMap,0,0,256,256);
+      var imageData = ctx.getImageData(0,0,256,256);
+      var lightMapImageData = lightMapCtx.getImageData(0,0,256,256);
+      for(var i = 0;i < imageData.data.length; i +=4){
+          imageData.data[i] = imageData.data[i] * lightMapImageData.data[i] / 255;
+          imageData.data[i+1] = imageData.data[i + 1] * lightMapImageData.data[i+1] / 255;
+          imageData.data[i+2] = imageData.data[i + 2] * lightMapImageData.data[i+2] / 255;
+      }
+      ctx.putImageData(imageData,0,0);
+    }
+
+    function algorithm2(params) {
+      ctx.globalCompositeOperation = 'multiply';
+      // ctx.globalCompositeOperation = 'screen';
+      // ctx.globalCompositeOperation = 'overlay';
+      // ctx.globalCompositeOperation = 'soft-light';
+      // ctx.globalCompositeOperation = 'hard-light';
+      ctx.drawImage(lightMap, 0, 0, 256, 256);
+    }
+
+    function  algorithm3() {
+      var r0 = 0, r1 = 256 / 2,
+          x0 = x1 = 256 / 2, y0 = y1 = 256/2;
+      var grd = ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+      grd.addColorStop(0.,'#FFFFFF');
+      grd.addColorStop(1.,'#000000');
+      ctx.fillStyle = grd;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillRect(0,0,256,256);
+    }
+   }
+
+  
+
+
+  </script>
+
+
+</head>
+
+<body onload="init()">
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

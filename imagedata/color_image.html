@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+
+    function init() {
+      var canvas = document.getElementById('can');
+      var ctx = canvas.getContext('2d');
+
+      var image = new Image();
+      image.onload = function () {
+        ctx.drawImage(image, 10, 100, image.width, image.height);
+        var red = {r:255,g:0,b:0,a:255};
+        var img = createColorImage(image, red, image.width, image.height);
+        ctx.drawImage(img, 300, 100, image.width, image.height);
+
+        var img2 = createColorImage2(image, red, image.width, image.height);
+        ctx.drawImage(img2, 600, 100, image.width, image.height);
+      };
+      image.src = "g.jpg";
+    }
+
+    function createCanvas(width, height) {
+      var c = document.createElement('canvas');
+      c.width = width;
+      c.height = height;
+      return c;
+    }
+
+
+    function createColorImage(image, color, width, height) {
+      var c = createCanvas(width, height);
+      var g2 = c.getContext('2d');
+      g2.drawImage(image, 0, 0, width, height);
+      try {
+        var imageData = g2.getImageData(0, 0, width, height);
+        var pix = imageData.data;
+        for (var i = 0, n = pix.length; i < n; i += 4) {
+          var r = pix[i + 0],
+            g = pix[i + 1],
+            b = pix[i + 2];
+          pix[i + 0] = Math.floor(color.r * r / 255);
+          pix[i + 1] = Math.floor(color.g * g / 255);
+          pix[i + 2] = Math.floor(color.b * b / 255);
+        }
+        g2.putImageData(imageData, 0, 0);
+      } catch (e) {
+        return image;
+      }
+      return c;
+    };
+
+    function createColorImage2(image, color, width, height) {
+      var c = createCanvas(width, height);
+      var g2 = c.getContext('2d');
+      g2.drawImage(image, 0, 0, width, height);
+      try {
+        var imageData = g2.getImageData(0, 0, width, height);
+        var pix = imageData.data;
+        for (var i = 0, n = pix.length; i < n; i += 4) {
+          var brightness = pix[i + 0] * 0.30 + pix[i + 1] * 0.59 + pix[i + 2] * 0.11;
+          pix[i + 0] = Math.floor(color.r * brightness / 255);
+          pix[i + 1] = Math.floor(color.g * brightness / 255);
+          pix[i + 2] = Math.floor(color.b * brightness / 255);
+        }
+        g2.putImageData(imageData, 0, 0);
+      } catch (e) {
+        return image;
+      }
+      return c;
+    };
+
+  </script>
+</head>
+
+<body onload="init()">
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>performance</title>
+  <style>
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    p {
+      margin: 0 100px;
+    }
+  </style>
+</head>
+
+<body onload="init()" style="background: gray;">
+  <select style="position: absolute;display:inline;left: 10px;">
+    <option id="screen">screen</option>
+    <option id="offscreen">offscreen</option>
+  </select>
+  <button id='heavyTask' style="position: absolute;display:inline;left: 100px;" onclick="redraw()">redraw</button>
+  <canvas id="canvas-bitmap" width="512" height="512" style="background: white;left: 10px;top: 20px;position: relative;"></canvas>
+  <script src="./ImageBitmap.js"></script>
+</body>
+
+</html>

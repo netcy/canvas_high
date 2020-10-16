@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <style>
+    body{
+        padding:0;
+        margin:0;
+        background: #000;
+    }
+  </style>
+  <title>Canvas clip</title>
+  <script type="text/javascript">
+    function init() {
+        let stars = []
+        var canvas = document.querySelector('#cvs');
+        let ctx = canvas.getContext('2d')
+        dpr(canvas);
+        function dpr(canvas) {
+            let width = canvas.width,
+            height = canvas.height;
+            if (window.devicePixelRatio) {
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+            canvas.height = height * window.devicePixelRatio;
+            canvas.width = width * window.devicePixelRatio;
+            var ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+        }
+        var img = new Image()
+        img.src = './girl.jpg'
+        img.onload = function () {
+           draw();
+        }
+
+        canvas.addEventListener('mousemove',function (e) {
+            draw(e.clientX,e.clientY);
+        });
+
+
+        function draw(x = 150,y=150) {
+           ctx.globalCompositeOperation = 'source-over';
+           ctx.clearRect(0,0,1000,800);
+           // 通过arc来绘制一个圆形区域
+           ctx.drawImage(img, 0, 0)
+           let grad = ctx.createRadialGradient(x, y, 40, x, y, 80)
+           grad.addColorStop(0, 'rgba(255, 0, 0, 1)')
+           grad.addColorStop(1, 'rgba(255, 0, 0, 0)')
+           ctx.globalCompositeOperation = 'destination-in';
+          //  ctx.globalCompositeOperation = 'destination-atop';
+           ctx.arc(x, y, 80, 0, 2 * Math.PI)
+           ctx.fillStyle = grad
+           ctx.fill()
+        }
+
+        function draw2(x = 150,y=150) {
+           ctx.globalCompositeOperation = 'source-over';
+           ctx.clearRect(0,0,1000,800);
+           let grad = ctx.createRadialGradient(x, y, 40, x, y, 80)
+           grad.addColorStop(0, 'rgba(255, 0, 0, 1)')
+           grad.addColorStop(1, 'rgba(255, 0, 0, 0)')
+           ctx.arc(x, y, 80, 0, 2 * Math.PI)
+           ctx.fillStyle = grad
+           ctx.fill()
+           ctx.globalCompositeOperation = 'source-atop';
+           ctx.drawImage(img, 0, 0)
+           
+        }
+    }
+  </script>
+</head>
+
+<body onload="init()" >
+  <canvas width="1000" height="800" id='cvs'></canvas>
+</body>
+
+</html>

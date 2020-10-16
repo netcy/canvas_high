@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script src="./fisheye.js"></script>
+  <script type="text/javascript">
+    function init() {
+      var canvas = document.getElementById('can');
+      dpr(canvas);
+      function dpr(canvas) {
+        let width = canvas.width,
+          height = canvas.height;
+        if (window.devicePixelRatio) {
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          canvas.height = height * window.devicePixelRatio;
+          canvas.width = width * window.devicePixelRatio;
+          var ctx = canvas.getContext('2d');
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+      var ctx = canvas.getContext('2d');
+      var radius = 50;
+      var fisheye = new Fisheye(radius * 2, 10);
+      var offCanvas = document.getElementById('offCan');
+      dpr(offCanvas);
+
+      var image = new Image();
+      image.onload = function () {
+        draw({
+          x: 100,
+          y: 70
+        });
+      };
+      image.src = './girl.jpg';
+
+      function draw(point) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawImage(image);
+        ctx.beginPath();
+        ctx.strokeStyle = 'red';
+        for (var i = 0; i < 20; i++) {
+          ctx.moveTo(0, i * 20);
+          ctx.lineTo(200, i * 20);
+        }
+
+        for (var i = 0; i < 20; i++) {
+          ctx.moveTo(i * 20, 0);
+          ctx.lineTo(i * 20, 200);
+        }
+        ctx.stroke();
+
+        if (point) {
+          drawMagnifier(point.x, point.y, radius);
+        }
+      }
+
+      function drawImage(image) {
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+      }
+
+      function drawMagnifier(cx, cy, radius) {
+        var offCtx = offCanvas.getContext('2d');
+        offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
+        var imageData1 = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        var imageData2 = offCtx.getImageData(0, 0, offCanvas.width, canvas.height);
+        fisheye.setCenter({
+          x: cx * 2,
+          y: cy * 2
+        });
+        for (var iy = 0; iy < offCanvas.height; iy++) {
+          for (var ix = 0; ix < offCanvas.width; ix++) {
+            var d = fisheye.distort({
+              x: ix,
+              y: iy
+            });
+            var x = (d.x + 0.5) | 0,
+              y = (d.y + 0.5) | 0;
+            var index1 = (y * canvas.width + x) * 4;
+            var index2 = (iy * offCanvas.width + ix) * 4;
+            imageData2.data[index2 + 0] = imageData1.data[index1 + 0];
+            imageData2.data[index2 + 1] = imageData1.data[index1 + 1];
+            imageData2.data[index2 + 2] = imageData1.data[index1 + 2];
+            imageData2.data[index2 + 3] = imageData1.data[index1 + 3];
+          }
+        }
+        offCtx.putImageData(imageData2, 0, 0);
+        offCtx.beginPath();
+        offCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+        offCtx.stroke();
+        drawImage(offCanvas);
+      }
+
+      var isMouseDown = false;
+      canvas.onmousedown = function (event) {
+        event.preventDefault() // 禁用默认事件
+        var point = windowToCanvas(event.clientX, event.clientY) // 获取鼠标相对于 canvas 标签的坐标
+        isMouseDown = true
+        draw(point) // 绘制在离屏canvas上绘制放大后的图像
+      }
+
+      canvas.onmousemove = function (event) {
+        event.preventDefault() // 禁用默认事件
+        if (isMouseDown === true) {
+          var point = windowToCanvas(event.clientX, event.clientY)
+          draw(point);
+        }
+      }
+
+      canvas.onmouseup = function (event) {
+        event.preventDefault() // 禁用默认事件
+        isMouseDown = false
+        draw();
+      }
+
+      canvas.onmouseout = function (event) {
+        event.preventDefault() // 禁用默认事件
+        isMouseDown = false
+        draw();
+      }
+
+      function windowToCanvas(x, y) {
+        var bbox = canvas.getBoundingClientRect() // bbox中存储的是canvas相对于屏幕的坐标
+        return {
+          x: x - bbox.x,
+          y: y - bbox.y
+        }
+      }
+      function drawImage(image) {
+        ctx.drawImage(image, 0, 0, 200, 200);
+      }
+    }
+  </script>
+</head>
+
+<body onload="init()">
+  <canvas width="200" height="200" id='can'></canvas>
+  <canvas width="200" height="200" id='offCan'></canvas>
+</body>
+
+</html>

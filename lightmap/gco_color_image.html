@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title>first</title>
+  <script type="text/javascript">
+    function init() {
+       var canvas = document.getElementById('can');
+      var ctx = canvas.getContext('2d'); 
+  
+      var image = new Image();
+      image.onload = function () {
+        var color = {
+            r:255,
+            g:0,
+            b:0,
+            a:1,
+        }
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        
+        var tempImage = createTempImage(image);
+       
+        ctx.drawImage(image,100,100,image.width,image.height);
+        var img = createColorImage3(tempImage,'red',image.width,image.height);
+        ctx.drawImage(img,100 + image.width,100 ,image.width,image.height);
+
+        var img = createColorImage4(tempImage,'red',image.width,image.height);
+        ctx.drawImage(img,100 + image.width * 2,100 ,image.width,image.height);
+      };
+      image.src = "d.png";
+      
+    }
+
+     function createCanvas(width,height) {
+        var c = document.createElement('canvas');
+        c.width = width;
+        c.height = height;
+        return c;
+    }
+
+     function createTempImage(image) {
+         if(!image.src.endsWith('.svg')){
+             return image;
+         }
+         var tempCanvas = createCanvas(image.width,image.height);
+        var tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(image,0,0,image.width,image.height);
+        return tempCanvas;
+    }
+    function createColorImage3 (image, color, width, height) {
+        var c = createCanvas(width, height);
+        var g2 = c.getContext('2d');
+        g2.fillStyle = color;   
+        g2.fillRect(0, 0, width, height);   
+        g2.globalCompositeOperation = "multiply";
+        g2.drawImage(image, 0, 0, width, height);
+        g2.globalCompositeOperation = "destination-atop";
+        g2.drawImage(image, 0, 0, width, height);
+        return c;
+    };
+
+    function createColorImage4 (image, color, width, height) {
+        var c = createCanvas(width, height);
+        var g2 = c.getContext('2d');
+        g2.drawImage(image, 0, 0, width, height);
+        g2.globalCompositeOperation = 'color';
+        // g2.globalCompositeOperation = 'overlay';
+        g2.fillStyle = color;   
+        g2.fillRect(0, 0, width, height);
+        g2.globalCompositeOperation = "destination-atop";
+        g2.drawImage(image, 0, 0, width, height); 
+        return c;
+    };
+  </script>
+
+
+</head>
+
+<body onload="init()">
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

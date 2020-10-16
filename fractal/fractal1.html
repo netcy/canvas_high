@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="pragma" content="no-cache">
+  <title></title>
+  <script type="text/javascript">
+    function init() {
+      var canvas = document.getElementById('can');
+    //   dpr(canvas);
+      var ctx = canvas.getContext('2d');
+      function dpr(canvas) {
+        let width = canvas.width,
+          height = canvas.height;
+        if (window.devicePixelRatio) {
+          canvas.style.width = width + "px";
+          canvas.style.height = height + "px";
+          canvas.height = height * window.devicePixelRatio;
+          canvas.width = width * window.devicePixelRatio;
+          var ctx = canvas.getContext('2d');
+          ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+      
+      var  cx = 200,cy = 200,r = 100;
+      var angle = Math.PI/2;
+      var x1 = cx + r * Math.cos(angle),
+          y1 = cx - r * Math.sin(angle);
+      var angle2 = angle + Math.PI * 2 / 3;
+      var x2 = cx + r * Math.cos(angle2),
+          y2 = cx - r * Math.sin(angle2);
+      var angle3 = angle2+ Math.PI * 2 / 3;
+      var x3 = cx + r * Math.cos(angle3),
+          y3 = cx - r * Math.sin(angle3);
+      var third = {x:x3,y:y3,next:null};
+      var second = {x:x2,y:y2,next:third};
+      var first = {x:x1,y:y1,next:second};
+      var head = first;
+
+      function fractal(head) {
+          var next = head.next;
+
+         var end = false;
+         if(next == null){
+             next = first;
+             end = true;
+         }
+         var vHead= new Vec2(head.x,head.y);
+         var vNext = new Vec2(next.x,next.y);
+
+         var v1 = new Vec2().lerpVectors(vHead,vNext,1/3);
+         var v2 = new Vec2().lerpVectors(vHead,vNext,2/3);
+         
+         var v = new Vec2().subVectors(v2,v1);
+
+         var vRot = new Vec2();
+         var PI3 = -Math.PI/3;
+         vRot.x = v.x * Math.cos(PI3) + v.y* Math.sin(PI3);
+         vRot.y = -v.x * Math.sin(PI3) + v.y* Math.cos(PI3);
+         var v3 = new Vec2().addVectors(vRot,v1);
+
+         var node1 = {x:v1.x,y:v1.y};
+         var node2 = {x:v2.x,y:v2.y};
+         var node3 = {x:v3.x,y:v3.y};
+
+         head.next = node1;
+         node1.next = node3;
+         node3.next = node2;
+         node2.next = end ? null : next;
+         
+         if(!end){
+             fractal(next);
+         }
+         
+      }
+      fractal(head);
+      fractal(head);
+      fractal(head);
+      fractal(head);
+      fractal(head);
+      
+      ctx.beginPath();
+    //   ctx.translate(200,200);
+    //   ctx.scale(3,3);
+      ctx.moveTo(head.x,head.y);
+      while (head.next != null) {
+        head = head.next;
+        ctx.lineTo(head.x,head.y);    
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    class Vec2 {
+        constructor(x = 0,y = 0){
+            this.x = x;
+            this.y = y;
+        }
+        addVectors(a,b){
+           this.x = a.x + b.x;
+           this.y = a.y + b.y; 
+           return this;
+        }
+        subVectors(a,b){
+            this.x = a.x - b.x;
+            this.y = a.y - b.y;
+            return this;
+        }
+        lerpVectors(a,b,r){
+            this.x = a.x + (b.x - a.x) * r;
+            this.y = a.y + (b.y - a.y) * r;
+            return this;
+        }      
+    }
+
+  </script>
+</head>
+
+<body onload="init()" >
+  <canvas width="1000" height="800" id='can'></canvas>
+</body>
+
+</html>

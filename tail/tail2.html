@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<body style="background:#5A515A">
+
+<canvas id="myCanvas" width="500" height="500" style="border:1px solid #c3c3c3;position: absolute;z-index: 100">
+Your browser does not support the canvas element.
+</canvas>
+
+<canvas id="canvas2" width="500" height="500" style="border:1px solid #c3c3c3; position: absolute;">
+Your browser does not support the canvas element.
+</canvas>
+
+<script type="text/javascript">
+  var c2 = document.getElementById("canvas2");
+  var g2 = c2.getContext("2d");
+
+  var image = new Image();
+  image.src = "./anhui.png";
+  image.onload = function(){
+    g2.drawImage(image, 0, 0, c2.width, c2.height);
+  };
+
+
+  var c=document.getElementById("myCanvas");
+  var g=c.getContext("2d");
+  g.fillStyle = "rgba(255,255,255,1)";
+  g.lineWidth = 10;
+
+  var render = function() {
+      mask();
+      drawCircle();
+  };
+ 
+  function mask() {
+     
+     //默认值为source-over
+     var prev = g.globalCompositeOperation;
+     //只显示canvas上原图像的重叠部分
+     g.globalCompositeOperation = 'destination-in';
+     //设置主canvas的绘制透明度
+     g.globalAlpha = 0.95;
+     //这一步目的是将canvas上的图像变的透明
+     g.fillRect(0, 0, c.width, c.height);
+     //在原图像上重叠新图像
+     g.globalCompositeOperation = prev;
+  }
+
+  //画圆
+  var radius = 1;
+  function drawCircle (){
+    var context = g;
+      context.beginPath();
+      context.arc(250, 100, radius, 0, Math.PI * 2);
+      context.closePath();
+      context.lineWidth = 2; //线条宽度
+      context.strokeStyle = 'rgba(250,0,0,1)'; //颜色
+      context.stroke();
+      radius += 0.5; //每一帧半径增加0.5
+      //半径radius大于30时，重置为0
+      if (radius > 30) {
+          radius = 0;
+      }
+  };
+
+  setInterval(render,20)
+
+
+</script>
+
+</body>
+</html>
